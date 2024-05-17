@@ -21,6 +21,7 @@ from huggingface_hub import HfFolder
 
 class Bert:
   def __init__(self, dataset_id, model_id, hyperparametes):
+    user_id = model_save.get_user_id()
     model_save.insert_status_model(model_id,dataset_id)
     self.dataset_id = 'yelp_review_full'
     self.model_id = model_id
@@ -35,8 +36,8 @@ class Bert:
     self.tokenized_inputs = None
     self.initialize()
     self.train_model()
-    model_save.update_status_model(model_id)
-    model_save.save_model(model_id,self.model)
+    model_save.update_status_model(model_id, user_id)
+    model_save.save_model(model_id,self.model, user_id)
 
   def initialize(self):
     # Load dataset from the hub
