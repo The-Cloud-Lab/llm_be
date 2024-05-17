@@ -44,8 +44,6 @@ class LLMWrapper:
         
         # Get the class from the module
         ModelClass = getattr(module, class_name)
-        
-        self.insert_status_model()
 
         start_time = time.time()
         # Instantiate the model and run it
@@ -54,8 +52,6 @@ class LLMWrapper:
         end_time = time.time()
 
         self.log_execution_time(start_time, end_time)
-        
-        self.update_status_model()
         
         return
     
