@@ -42,8 +42,11 @@ class LLMWrapper:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         
+        user_id = supabase_client.auth.current_user['id']
         # Get the class from the module
         ModelClass = getattr(module, class_name)
+
+        self.insert_status_model(self.model_id, self.dataset_id, user_id)
 
         start_time = time.time()
         # Instantiate the model and run it
@@ -51,9 +54,25 @@ class LLMWrapper:
 
         end_time = time.time()
 
+        self.update_status_model(self.model_id, self.dataset_id, user_id)
+
         self.log_execution_time(start_time, end_time)
         
         return
+
+    def insert_status_model(model, dataset_id, user_id):
+        model_id = supabase_client.table('models').select('id').eq('model', str(model)).execute().get('data',[])[0].get('id')
+        insert_data = { 'user_id' : user_id,
+                        'model_id' : model_id,
+                        'dataset_id' : dataset_id,
+                        'status' : False }
+        supabase_client.table("trained_models").insert(insert_data).execute()
+
+    def update_status_model(model, dataset_id, user_id):
+        model_id = supabase_client.table('models').select('id').eq('model', str(model)).execute().get('data',[])[0].get('id')
+        id = supabase_client.table('trained_models').select('id').eq('model_id', str(model_id)).eq('dataset_id',str(dataset_id)).eq('user_id',user_id).execute().get('data',[])[0].get('id')
+        upsert_data = {'id':id, 'status' : True}
+        supabase_client.table('trained_models').upsert(upsert_data).execute()
     
     # Function to log execution time to Supabase
     def log_execution_time(self,start_time, end_time):

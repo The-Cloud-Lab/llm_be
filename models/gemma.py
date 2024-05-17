@@ -21,7 +21,6 @@ from trl import SFTTrainer
 class Gemma:
     def __init__(self, dataset_id, model_id, hyperparameters):
         user_id = model_save.get_user_id()
-        model_save.insert_status_model(model_id,dataset_id)
         self.dataset_id = 'philschmid/dolly-15k-oai-style'
         self.model_id = model_id
         self.dataset = None
@@ -34,8 +33,7 @@ class Gemma:
 
         self.initialize()
         self.train_model()
-        model_save.update_status_model(model_id, user_id)
-        model_save.save_model(model_id, self.model, user_id)
+        model_save.save_model(model_id, self.model, dataset_id, user_id)
 
     def initialize(self):
         login(token="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", add_to_git_credential=True)
