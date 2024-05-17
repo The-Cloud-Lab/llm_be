@@ -3,7 +3,7 @@ import pandas as pd
 import torch
 from datasets import load_dataset
 import os
-
+import model_save
 import nltk
 from nltk.tokenize import sent_tokenize
 import sentencepiece
@@ -18,6 +18,7 @@ from trl import SFTTrainer
 
 class Llama:
     def __init__(self, dataset_id, model_id, hyperparameters):
+        model_save.insert_status_model(model_id,dataset_id)
         self.dataset_id = 'databricks/databricks-dolly-15k'
         self.model_id = model_id
         self.dataset = None
@@ -32,6 +33,8 @@ class Llama:
         self.max_target_length = None
         self.initialize()
         self.train_model()
+        model_save.update_status_model(model_id)
+        model_save.save_model(model_id,self.model)
 
     def initialize(self):
             # Load dataset from the hub
