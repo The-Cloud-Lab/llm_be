@@ -60,7 +60,7 @@ class LLMWrapper:
         
         return
 
-    def insert_status_model(model, dataset_id, user_id):
+    def insert_status_model(self, model, dataset_id, user_id):
         model_id = supabase_client.table('models').select('id').eq('model', str(model)).execute().get('data',[])[0].get('id')
         insert_data = { 'user_id' : user_id,
                         'model_id' : model_id,
@@ -68,7 +68,7 @@ class LLMWrapper:
                         'status' : False }
         supabase_client.table("trained_models").insert(insert_data).execute()
 
-    def update_status_model(model, dataset_id, user_id):
+    def update_status_model(self, model, dataset_id, user_id):
         model_id = supabase_client.table('models').select('id').eq('model', str(model)).execute().get('data',[])[0].get('id')
         id = supabase_client.table('trained_models').select('id').eq('model_id', str(model_id)).eq('dataset_id',str(dataset_id)).eq('user_id',user_id).execute().get('data',[])[0].get('id')
         upsert_data = {'id':id, 'status' : True}
