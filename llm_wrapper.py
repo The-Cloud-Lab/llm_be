@@ -56,7 +56,7 @@ class LLMWrapper:
 
         self.update_status_model(self.model_id, self.dataset_id, user_id)
 
-        self.log_execution_time(start_time, end_time)
+        self.log_execution_time(start_time, end_time, user_id)
         
         return
 
@@ -70,13 +70,19 @@ class LLMWrapper:
 
     def update_status_model(self, model, dataset_id, user_id):
         model_id = supabase_client.table('models').select('id').eq('model', str(model)).execute().get('data',[])[0].get('id')
-        id = supabase_client.table('trained_models').select('id').eq('model_id', str(model_id)).eq('dataset_id',str(dataset_id)).eq('user_id',user_id).execute().get('data',[])[0].get('id')
-        upsert_data = {'id':id, 'status' : True}
-        supabase_client.table('trained_models').upsert(upsert_data).execute()
+        row = supabase_client.table('trained_models').select('*').eq('model_id', str(model_id)).eq('dataset_id',str(dataset_id)).eq('user_id',user_id).execute().get('data',[])[0]
+        if row:
+            try:
+                supabase_client.table('trained_models').delete().eq('id',str(row['id'])).execute()
+            except Exception as e:
+                print(e)
+
+        row['status'] = 'completed'
+        supabase_client.table('trained_models').insert(row).execute()
     
     # Function to log execution time to Supabase
-    def log_execution_time(self,start_time, end_time):
+    def log_execution_time(self,start_time, end_time, user_id):
         execution_time = (end_time - start_time)/3600
-        user_id = supabase_client.auth.current_user['id']
         # Insert the execution time along with model_id and dataset_id into Supabase
-        supabase_client.table('execution_times').insert({'execution_time': execution_time, 'model_id': self.model_id, 'dataset_id': self.dataset_id, 'user_id': user_id}).execute()
+        supabase_client.table('execution_times').insert({'execution_time': execution_time, 'model': self.model_id, 'dataset_id': self.dataset_id, 'user_id': user_id}).execute()
+
