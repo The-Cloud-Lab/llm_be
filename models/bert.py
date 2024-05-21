@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import evaluate
 from datasets import load_dataset
+import model_save
 
 # from utilities import *
 from transformers import AutoTokenizer
@@ -20,6 +21,7 @@ from huggingface_hub import HfFolder
 
 class Bert:
   def __init__(self, dataset_id, model_id, hyperparametes):
+    user_id = model_save.get_user_id()
     self.dataset_id = 'yelp_review_full'
     self.model_id = model_id
     self.dataset = None
@@ -33,6 +35,7 @@ class Bert:
     self.tokenized_inputs = None
     self.initialize()
     self.train_model()
+    model_save.save_model(model_id,self.model, dataset_id, user_id)
 
   def initialize(self):
     # Load dataset from the hub

@@ -107,12 +107,11 @@ def get_datasets():
         if search_param:
             api_url += f'search={search_param}&'
         if filter_param:
-            api_url += f'filter={filter_param}&'
-            api_url += f'sort=downloads&'
-            api_url += f'direction=-1&'
-            api_url += f'limit=20&'
-        else:
-            return jsonify({'error': 'Task_Id missing'})
+            api_url += f'filter={filter_param}&' 
+        api_url += f'sort=downloads&'
+        api_url += f'direction=-1&'
+        api_url += f'limit=20&'
+        
 
         # Send GET request to the Hugging Face API
         response = requests.get(api_url)

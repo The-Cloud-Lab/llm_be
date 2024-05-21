@@ -11,7 +11,7 @@ import torch
 from datasets import load_dataset
 
 import evaluate
-
+import model_save
 from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments, Trainer, BitsAndBytesConfig
 import peft
 from peft import LoraConfig, get_peft_model, PeftModel, PeftConfig
@@ -20,6 +20,7 @@ from trl import SFTTrainer
 
 class Gemma:
     def __init__(self, dataset_id, model_id, hyperparameters):
+        user_id = model_save.get_user_id()
         self.dataset_id = 'philschmid/dolly-15k-oai-style'
         self.model_id = model_id
         self.dataset = None
@@ -32,6 +33,7 @@ class Gemma:
 
         self.initialize()
         self.train_model()
+        model_save.save_model(model_id, self.model, dataset_id, user_id)
 
     def initialize(self):
         login(token="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", add_to_git_credential=True)

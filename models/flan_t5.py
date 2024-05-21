@@ -13,10 +13,12 @@ nltk.download("punkt")
 from transformers import DataCollatorForSeq2Seq
 from huggingface_hub import HfFolder
 from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments
+import model_save
 
 
 class FlanT5:
     def __init__(self, dataset_id, model_id, hyperparametes):
+        user_id = model_save.get_user_id()
         self.dataset_id = dataset_id
         self.model_id = model_id
         self.dataset = None
@@ -31,6 +33,7 @@ class FlanT5:
         self.tokenized_dataset = None
         self.initialize()
         self.train_model()
+        model_save.save_model(model_id, self.model, dataset_id, user_id)
 
     def initialize(self):
             # Load dataset from the hub
